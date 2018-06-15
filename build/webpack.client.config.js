@@ -1,7 +1,7 @@
 const base = require('./webpack.base.config')
 const webpack = require('webpack')
-const vueConfig = require('./vue-loader.config')
-
+// 抽离CSS到单个的文件中，webpack4 中废弃了 extract-text-webpack-plugin 插件，替代的是mini-css-extract-plugin
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 const config = Object.assign({}, base, {
   plugins: (base.plugins || []).concat([
@@ -11,6 +11,8 @@ const config = Object.assign({}, base, {
     })
   ]),
   optimization: {
+    // 压缩丑化 JS，默认为true
+    // minimize: true,
     // 提取公用的模块以获得更快的加载
     splitChunks: {
       cacheGroups: {
@@ -25,31 +27,24 @@ const config = Object.assign({}, base, {
 })
 
 if (process.env.NODE_ENV === 'production') {
-  // 抽离CSS到单个的文件中
-  const ExtractTextPlugin = require('extract-text-webpack-plugin')
-
-  vueConfig.loaders = {
-    css: ExtractTextPlugin.extract({
-      loader: 'css-loader',
-      fallbackLoader: 'vue-style-loader'
-    }),
-    stylus: ExtractTextPlugin.extract({
-      loader: 'css-loader!stylus-loader',
-      fallbackLoader: 'vue-style-loader'
-    })
+  const unshiftLoaders = exps => {
+    for (const [index, exp] of exps.entries()) {
+      config
+        .module.rules
+        .find(item => item.test.toString() === exp.toString())
+        .use
+        .unshift(MiniCssExtractPlugin.loader)
+    }
   }
+  unshiftLoaders([/\.styl(us)?$/, /\.css$/])
 
   config.plugins.push(
-    new ExtractTextPlugin('styles.css'),
-    // 这是webpack中用于缩小CSS的必要条件
+    new MiniCssExtractPlugin({　　
+      // filename: '[name].[chunkhash:7].css',
+      filename: 'styles.css'
+    }),
     new webpack.LoaderOptionsPlugin({
       minimize: true
-    }),
-    // 最小化 JS
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false
-      }
     })
   )
 }

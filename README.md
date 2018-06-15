@@ -1,30 +1,32 @@
-# kv2 = koa 2.x + vue 2.x server side rendering
+# Koa2.x + Vue2.x + Webpack4.x
 
-> A Vue.js project with vue 2.0, vue-router and vuex starter kit for server side rendering.
+> 一个基于Koa2.x + Vue2.x + Webpack4.x 的Vue服务端渲染方案
 
-## Build Setup
-
-Node.js 4.x+
-
-``` bash
-npm install
-npm run build
-npm start
+## 起步
+```bash
+yarn # npm install
 ```
 
-## Development Setup
+## 开发
 
 ```bash
-npm install
-npm run dev
+yarn dev # npm run dev
 ```
 
-## Reference resources
+## 编译#部署
+
+Node.js 7.6+
+
+```bash
+yarn build # npm run build
+yarn start # npm start
+```
+
+## 参考
 
 - [vue-ssr-starter-kit](https://github.com/doabit/vue-ssr-starter-kit)
-- [vue-ssr-demo](https://github.com/yyx990803/vue-ssr-demo)
 - [vue-hackernews-2.0](https://github.com/vuejs/vue-hackernews-2.0)
 
 ## License
 
-[MIT](http://opensource.org/licenses/MIT)
+[MIT](LICENSE)

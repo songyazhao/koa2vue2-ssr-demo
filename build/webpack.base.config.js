@@ -1,5 +1,4 @@
-const path = require('path')
-const vueConfig = require('./vue-loader.config')
+const { resolve } = require('path')
 
 module.exports = {
   mode: process.env.NODE_ENV || 'production',
@@ -12,17 +11,18 @@ module.exports = {
   },
 
   resolve: {
-    modules: [path.resolve(__dirname, 'src'), 'node_modules'],
+    modules: [resolve(__dirname, 'src'), 'node_modules'],
     extensions: ['.js', '.vue'],
     alias: {
-      'src': path.resolve(__dirname, '../src'),
-      'assets': path.resolve(__dirname, '../src/assets'),
-      'components': path.resolve(__dirname, '../src/components')
+      '~': resolve(__dirname, '../'),
+      'src': resolve(__dirname, '../src'),
+      'assets': resolve(__dirname, '../src/assets'),
+      'components': resolve(__dirname, '../src/components')
     }
   },
 
   output: {
-    path: path.resolve(__dirname, '../dist'),
+    path: resolve(__dirname, '../dist'),
     publicPath: '/dist/',
     filename: 'client-bundle.js'
   },
@@ -32,31 +32,51 @@ module.exports = {
       {
         enforce: 'pre',
         test: /\.js$/,
-        loader: 'eslint-loader',
+        use: 'eslint-loader',
         exclude: /node_modules/
       },
       {
         enforce: 'pre',
         test: /\.vue$/,
-        loader: 'eslint-loader',
+        use: 'eslint-loader',
         exclude: /node_modules/
       },
       {
         test: /\.vue$/,
-        loader: 'vue-loader',
-        options: vueConfig
+        use: 'vue-loader'
       },
       {
         test: /\.js$/,
-        loader: 'babel-loader',
+        use: 'babel-loader',
         exclude: /node_modules/
       },
       {
+        // @see https://vue-loader.vuejs.org/guide/extract-css.html
+        test: /\.css$/,
+        use: [
+          'vue-style-loader',
+          'css-loader'
+        ]
+      },
+      {
+        // @see https://vue-loader.vuejs.org/guide/pre-processors.html#stylus
+        test: /\.styl(us)?$/,
+        use: [
+          'vue-style-loader',
+          'css-loader',
+          'stylus-loader'
+        ]
+      },
+      {
         test: /\.(png|jpg|gif|svg)$/,
-        loader: 'file-loader',
-        options: {
-          name: '[name].[ext]?[hash]'
-        }
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]?[hash]'
+            }
+          }
+        ]
       }
     ]
   }

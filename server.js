@@ -85,7 +85,7 @@ app.use((ctx, next) => {
 
   renderStream.on('end', () => {
     ctx.end(html.tail)
-    console.log(`请求处理耗时: ${Date.now() - s}ms`)
+    console.log(`渲染耗时: ${Date.now() - s}ms`)
   })
 
   renderStream.on('error', err => {

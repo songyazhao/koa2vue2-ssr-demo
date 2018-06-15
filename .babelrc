@@ -1,0 +1,17 @@
+{
+  "presets": [
+    ["env", {
+      "modules": false,
+      "targets": {
+        "browsers": ["> 3%", "last 3 versions", "not ie <= 9"]
+      }
+    }]
+  ],
+  "plugins": [
+    "jsx-v-model",
+    "transform-vue-jsx",
+    "transform-object-rest-spread"
+  ],
+  "comments": false,
+  "ignore": ["node_modules/*"]
+}

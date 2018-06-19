@@ -7,7 +7,7 @@ const config = Object.assign({}, base, {
   plugins: (base.plugins || []).concat([
     // 在 Vue 代码中去掉注释
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production')
     })
   ]),
   optimization: {

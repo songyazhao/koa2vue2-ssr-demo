@@ -4,7 +4,7 @@ const MFS = require('memory-fs')
 const clientConfig = require('./webpack.client.config')
 const serverConfig = require('./webpack.server.config')
 
-module.exports = function setupDevServer (app, onUpdate) {
+module.exports = function setupDevServer(app, onUpdate) {
   // 注册编译和热重载
   clientConfig.entry.app = ['webpack-hot-middleware/client', clientConfig.entry.app]
   clientConfig.plugins.push(new webpack.HotModuleReplacementPlugin())

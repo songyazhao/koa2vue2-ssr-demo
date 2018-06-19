@@ -1,14 +1,15 @@
 'use strict'
 
 process.env.VUE_ENV = 'server'
-const isProd = process.env.NODE_ENV === 'production'
+
+const isDev = process.env.NODE_ENV === 'development'
 
 const fs = require('fs')
 const path = require('path')
 const resolve = file => path.resolve(__dirname, file)
 const serialize = require('serialize-javascript')
 
-const createBundleRenderer = require('vue-server-renderer').createBundleRenderer
+const { createBundleRenderer } = require('vue-server-renderer')
 
 const Koa = require('koa')
 const app = new Koa()
@@ -21,7 +22,7 @@ const html = (() => {
   const template = fs.readFileSync(resolve('./index.html'), 'utf-8')
   const i = template.indexOf('{{ APP }}')
   // 在开发模式(development)下通过 vue-style-loader 动态插入 styles
-  const style = isProd ? '<link rel="stylesheet" href="/dist/styles.css">' : ''
+  const style = isDev ? '' : '<link rel="stylesheet" href="/dist/styles.css">'
   return {
     head: template.slice(0, i).replace('{{ STYLE }}', style),
     tail: template.slice(i + '{{ APP }}'.length)
@@ -29,17 +30,17 @@ const html = (() => {
 })()
 
 let renderer
-if (isProd) {
-  // 从fs中创建服务端渲染器
-  const bundlePath = resolve('./dist/server-bundle.js')
-  renderer = createRenderer(fs.readFileSync(bundlePath, 'utf-8'))
-} else {
+if (isDev) {
   require('./build/dev-server')(app, bundle => {
     renderer = createRenderer(bundle)
   })
+} else {
+  // 从fs中创建服务端渲染器
+  const bundlePath = resolve('./dist/server-bundle.js')
+  renderer = createRenderer(fs.readFileSync(bundlePath, 'utf-8'))
 }
 
-function createRenderer (bundle) {
+function createRenderer(bundle) {
   return createBundleRenderer(bundle, {
     cache: require('lru-cache')({
       max: 1000,
@@ -49,24 +50,23 @@ function createRenderer (bundle) {
 }
 
 app.use(require('koa-bigpipe'))
-app.use(favicon(path.resolve(__dirname, 'src/assets/logo.png')))
+app.use(favicon(resolve('src/assets/logo.png')))
 
 router.get('/dist', serve(resolve('./dist')))
 
 app.use((ctx, next) => {
-  let res = ctx.res
-  let req = ctx.req
+  const res = ctx.res
+  const req = ctx.req
   if (!renderer) {
     return res.end('等待编译... 即将刷新.')
   }
 
-  var s = Date.now()
   const context = { url: req.url }
   const renderStream = renderer.renderToStream(context)
+  let s = Date.now()
   let firstChunk = true
 
   ctx.write(html.head)
-
   // on('data'...) 流动模式
   renderStream.on('data', chunk => {
     if (firstChunk) {
